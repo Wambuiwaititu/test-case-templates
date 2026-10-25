@@ -1,0 +1,30 @@
+ID,Module,Title,Preconditions,Steps,Test Data,Expected Result,Priority,Type,Status
+TC-01,Purchase,Create RFQ for a vendor,Vendor and product exist,"1. Purchase > New
+2. Select vendor, add product line
+3. Save","Acme Supplies, Office Chair x5",RFQ saved in state RFQ with correct total KES 40000,High,Functional,Not Run
+TC-02,Purchase,Send RFQ by email,TC-01 done,"1. Open RFQ
+2. Click Send by Email",RFQ from TC-01,State changes to RFQ Sent; email logged in chatter,Medium,Functional,Not Run
+TC-03,Purchase,Confirm PO below approval threshold,Logged in as Purchase User,"1. Open RFQ (KES 40000)
+2. Confirm Order",TC-01 RFQ,State = Purchase Order; receipt created,High,Functional,Not Run
+TC-04,Purchase,PO above threshold blocked for normal user,Logged in as Purchase User,"1. Create RFQ Office Chair x15 (KES 120000)
+2. Confirm Order",Threshold KES 100000,Error says manager approval is needed; PO stays draft,High,Negative,Not Run
+TC-05,Purchase,PO exactly at threshold,Purchase User,"1. Create RFQ totalling KES 100000
+2. Confirm",Threshold KES 100000,PO confirms without approval (boundary),Medium,Boundary,Not Run
+TC-06,Purchase,Manager approves PO above threshold,TC-04 PO exists,"1. Log in as Manager
+2. Approve
+3. Log in as User and confirm",TC-04 PO,PO confirmed; Approved By = Manager,High,Functional,Not Run
+TC-07,Inventory,Receive full quantity,Confirmed PO x5,"1. Open receipt
+2. Validate",5 units,Receipt done; on-hand +5; PO received qty = 5,High,Functional,Not Run
+TC-08,Inventory,Partial receipt creates backorder,Confirmed PO x10,"1. Set done qty 6
+2. Validate
+3. Choose Create Backorder",6 of 10,Receipt done for 6; backorder for 4 created,High,Functional,Not Run
+TC-09,Accounting,Bill matches received qty (3-way match),TC-08 done; billing policy = received qty,"1. Create Bill from PO",PO from TC-08,Bill quantity = 6 not 10,High,Functional,Not Run
+TC-10,Accounting,Bill above received qty flagged,TC-08 done,"1. Create bill
+2. Change qty to 10
+3. Post",PO from TC-08,Warning shown or bill not matched to PO lines; flagged for review,High,Negative,Not Run
+TC-11,Accounting,Post vendor bill,Bill from TC-09,"1. Set bill date and reference
+2. Confirm",Ref INV-2026-001,"Journal entry: Dr Expense/Stock Interim, Cr Payables; state Posted",High,Functional,Not Run
+TC-12,Accounting,Duplicate vendor reference warning,Bill with ref INV-2026-001 posted,"1. Create new bill same vendor and same reference",INV-2026-001,Duplicate warning shown,Medium,Negative,Not Run
+TC-13,Accounting,Register full payment,Posted bill,"1. Register Payment
+2. Confirm",Bank journal,Bill shows Paid; payables reconciled,High,Functional,Not Run
+TC-14,Purchase,Cancel PO after receipt not allowed,PO with validated receipt,"1. Click Cancel",PO from TC-07,Odoo blocks cancellation or asks to return goods first,Medium,Negative,Not Run
